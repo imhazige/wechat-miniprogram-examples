@@ -1,0 +1,5 @@
+
+<map id="map" class='map'>
+    <cover-view class="time" style="{{popStyle}}" bind:regionchange="onMapRegionchange">{{popMsg}}</cover-view>
+</map>
+

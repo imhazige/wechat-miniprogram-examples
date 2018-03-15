@@ -1,0 +1,32 @@
+.controls {
+  position: relative;
+  top: 50%;
+  height: 50px;
+  margin-top: -25px;
+  display: flex;
+}
+.time {
+  text-align: center;
+  background-color: rgba(0, 0, 0, .5);
+  color: white;
+  line-height: 50px;
+  height:30rpx;
+  width:30rpx;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+.img {
+  width: 40px;
+  height: 40px;
+  margin: 5px auto;
+}
+.map{
+  height:60%;
+  width:100%
+}
+
+page{
+  height:100%;
+  width:100%
+}
