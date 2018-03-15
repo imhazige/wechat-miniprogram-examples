@@ -1,5 +1,7 @@
 // pages/movingPopup/movingPopup.js
 import keys from '../../key';
+import baidu from '../../utils/baiduApi'
+import async from '../../utils/async.min.js'
 
 Page({
 
@@ -7,7 +9,16 @@ Page({
    * 页面的初始数据
    */
   data: {
-    popMsg: 'init'
+    popMsg: 'init',
+    controls: [{
+      id: 1,
+      iconPath: '/imgs/ic_controls.png',
+      position: {
+        left: 0,
+        top: 200
+      },
+      clickable: true
+    }]
   },
 
   /**
@@ -29,39 +40,74 @@ Page({
    */
   onShow: function () {
     this.mapCtx = wx.createMapContext('map', this.context);
-    this.setData({
-      // longtitude:30,
-      // latitude:30,
-      popStyle: ''
+    // this.setData({
+    //   popStyle: '----'
+    // });
+    async.waterfall([
+      function (callback) {
+        callback(null, 'one', 'two');
+      },
+      function (arg1, arg2, callback) {
+        // arg1 now equals 'one' and arg2 now equals 'two'
+        callback(null, 'three');
+      },
+      function (arg1, callback) {
+        // arg1 now equals 'three'
+        callback(null, 'done');
+      }
+    ], function (err, result) {
+      // result now equals 'done'
+      console.log('---' + result);
     });
+
   },
 
-  requestTimeStamp:null,
+  onControltap: function () {
+    //重新生成路径
+    this.requestTimeStamp = new Date();
+    randomPos(this.requestTimeStamp);
+  },
 
-  randomPos:function(stamp){
-    wx.request({
-      url: 'https://api.map.baidu.com/geocoder/v2/',
-      mathod:'GET',
-      data:{
-        ak: keys.baiduAppKey,
-        output:'json',
-        location: res.latitude + ',' + res.longitude,
-        coordtype:'gcj02ll'
-      },
+  requestTimeStamp: null,
+
+  randomPos: function (stamp) {
+    //TODO 随机地图范围内上的两个点
+    let pos1 = null;
+    let pos2 = null;
+
+    // async.waterfall
+    //TODO 获得点对应的地理位置
+    //获得屏幕区域
+    this.mapCtx.getRegion({
       success: (res) => {
-        let data = res.data;
-        if (data.status){
-          console.log('error status ' + data.status);
-          return;
-        }
-        // console.log('data' , data);
-        console.log(data.result.sematic_description);
-      },
+
+      }
+    });
+
+    //TODO 路线规划
+
+    //TODO 开始按路线行进
+
+    baidu.reverseGeo({
+      latitude: 0,
+      longitude: 0
+    }).then((res) => {
+      if (stamp != this.requestTimeStamp) {
+        console.info('忽略过期请求', stamp, this.requestTimeStamp);
+        return;
+      }
+      let data = res.data;
+      if (data.status) {
+        console.log('error status ' + data.status);
+        return;
+      }
+      // console.log('data' , data);
+      console.log(data.result.sematic_description);
     });
   },
 
-  regeoLoc:function(){
-    
+  relocate: function () {
+
   },
 
   onMapRegionchange: function () {
@@ -69,6 +115,7 @@ Page({
       this.requestTimeStamp = new Date();
       return;
     }
+
 
   },
 

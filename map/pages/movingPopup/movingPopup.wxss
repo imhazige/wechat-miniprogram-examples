@@ -22,7 +22,8 @@
   margin: 5px auto;
 }
 .map{
-  height:60%;
+  /* 不全屏，测试计算 */
+  height:90%;
   width:100%
 }
 
