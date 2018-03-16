@@ -1,5 +1,7 @@
 <template>
-  <map></map>
+  <div class="container my-container">
+      <map id="map" class="map"></map>
+  </div>
 </template>
 
 <script>
@@ -32,9 +34,27 @@ export default {
 };
 </script>
 
+<style>
+/* 起作用 -- page */
+body {
+  height: 100%;
+  width: 100%;
+}
+</style>
 <style scoped>
-page{
-  height: 100%rpx;
-  width:100%rpx;
+/* 不起作用 -- page */
+body {
+  height: 100%;
+  width: 100%;
+}
+</style>
+<style>
+.map {
+  height: 80%;
+  width: 100%;
+}
+.my-container {
+  height: 100%;
+  width: 100%;
 }
 </style>
