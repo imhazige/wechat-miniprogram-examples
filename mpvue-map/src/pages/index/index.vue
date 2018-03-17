@@ -34,7 +34,7 @@ export default {
         }
       });
     },
-    clickHandle(msg , ev) {
+    clickHandle(msg, ev) {
       console.log("clickHandle:", msg, ev);
     },
     onGoBubblesClick(ev) {

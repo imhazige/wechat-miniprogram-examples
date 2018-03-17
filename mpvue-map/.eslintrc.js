@@ -1,10 +1,10 @@
 // http://eslint.org/docs/user-guide/configuring
 
 module.exports = {
-  root: true,
-  parser: 'babel-eslint',
+  root: false,
+  parser: "babel-eslint",
   parserOptions: {
-    sourceType: 'module'
+    sourceType: "module"
   },
   env: {
     browser: false,
@@ -12,23 +12,26 @@ module.exports = {
     es6: true
   },
   // https://github.com/standard/standard/blob/master/docs/RULES-en.md
-  extends: 'standard',
+  extends: "standard",
   // required to lint *.vue files
-  plugins: [
-    'html'
-  ],
+  plugins: ["html"],
   // add your custom rules here
-  'rules': {
+  // rules :null,
+  rules: {
     // allow paren-less arrow functions
-    'arrow-parens': 0,
+    "arrow-parens": 0,
     // allow async-await
-    'generator-star-spacing': 0,
+    "generator-star-spacing": 0,
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'semi': 0,
-    'space-before-function-paren': 0,
-    'comma-spacing': 0,
-    'quotes': 0
+    "no-debugger": process.env.NODE_ENV === "production" ? 2 : 0,
+    semi: 0,
+    "space-before-function-paren": 0,
+    "comma-spacing": 0,
+    quotes: 0,
+    "no-undef": 0,
+    "no-unused-vars": 0,
+    eqeqeq: 0,
+    'no-multiple-empty-lines':0
   },
   globals: {
     App: true,
@@ -37,4 +40,4 @@ module.exports = {
     getApp: true,
     getPage: true
   }
-}
+};
