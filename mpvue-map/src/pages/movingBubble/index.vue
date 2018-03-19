@@ -1,6 +1,6 @@
 <template>
   <div class="my-container">
-      <map id="map" class='map' :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
+      <map id="map" class='map' :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
           <cover-view class="time"  :style="popStyle">{{popMsg}}</cover-view>
       </map>
   </div>
@@ -16,6 +16,7 @@ export default {
       popStyle: "some",
       motto: "Hello World",
       userInfo: {},
+      markers: [],
       controls: [
         {
           id: 1,
@@ -110,6 +111,18 @@ export default {
 
                 log.debug("随机点", pos1, pos2);
 
+                that.markers = [
+                  {
+                    iconPath: "/static/imgs/icon_location.png",
+                    latitude: pos1.latitude,
+                    longitude: pos1.longitude
+                  },
+                  {
+                    iconPath: "/static/imgs/icon_location.png",
+                    latitude: pos2.latitude,
+                    longitude: pos2.longitude
+                  }
+                ];
                 callback(null, res);
               },
               fail: err => {
@@ -117,7 +130,7 @@ export default {
               }
             });
           },
-          function(arg1, arg2, callback) {
+          function(arg1, callback) {
             // arg1 now equals 'one' and arg2 now equals 'two'
             callback(null, "three");
           },
@@ -148,10 +161,10 @@ export default {
       }
     }
   },
-
-  created() {
+  mounted() {
     this.mapCtx = wx.createMapContext("map", this.context);
-  }
+  },
+  created() {}
 };
 </script>
 
