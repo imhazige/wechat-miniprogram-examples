@@ -13,21 +13,23 @@ import log from "../../utils/log";
 export default {
   data() {
     return {
-      popStyle:'some',
+      popStyle: "some",
       motto: "Hello World",
       userInfo: {},
-      controls: [{
-        id: 1,
-        iconPath: "/static/imgs/ic_controls.png",
-        position: {
-          left: 0,
-          top: 200
-          // width:2000,
-        // height:200
-        },
-        
-        clickable: true
-      }],
+      controls: [
+        {
+          id: 1,
+          iconPath: "/static/imgs/ic_controls.png",
+          position: {
+            left: 0,
+            top: 200
+            // width:2000,
+            // height:200
+          },
+
+          clickable: true
+        }
+      ],
       popMsg: "init"
     };
   },
@@ -48,10 +50,12 @@ export default {
       });
     },
     onControltap: function(e) {
-      log.debug("control tap....");
+      log.debug("control tap....", this.mapCtx);
+      this.randomPos();
     },
 
     randomPos: function(stamp) {
+      const that = this;
       // TODO 随机地图范围内上的两个点
       let pos1 = null;
       let pos2 = null;
@@ -80,12 +84,36 @@ export default {
           //     });
           // },
           function(callback) {
+            log.debug("1--------------");
             // 获得屏幕区域
-            this.mapCtx.getRegion({
-              success: res => {
+            that.mapCtx.getRegion({
+              success: function(res) {
                 // {southwest, northeast}
-                log.debug("getREgion", res);
+                log.debug("getRegion", res);
+                let longitudeScope =
+                  res.northeast.longitude - res.southwest.longitude;
+                let latitudeScope =
+                  res.northeast.latitude - res.southwest.latitude;
+
+                pos1 = {
+                  longitude:
+                    res.southwest.longitude + Math.random() * longitudeScope,
+                  latitude:
+                    res.southwest.latitude + Math.random() * latitudeScope
+                };
+                pos2 = {
+                  longitude:
+                    res.southwest.longitude + Math.random() * longitudeScope,
+                  latitude:
+                    res.southwest.latitude + Math.random() * latitudeScope
+                };
+
+                log.debug("随机点", pos1, pos2);
+
                 callback(null, res);
+              },
+              fail: err => {
+                log.error(err);
               }
             });
           },
