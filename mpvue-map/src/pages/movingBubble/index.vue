@@ -9,6 +9,7 @@
 <script>
 import async from "async";
 import log from "../../utils/log";
+import baiduApi from "../../utils/baiduApi";
 
 export default {
   data() {
@@ -63,27 +64,6 @@ export default {
 
       async.waterfall(
         [
-          // function(callback) {
-          //    //TODO 获得点对应的地理位置
-          //   baidu
-          //     .reverseGeo({
-          //       latitude: 0,
-          //       longitude: 0
-          //     })
-          //     .then(res => {
-          //       if (stamp != this.requestTimeStamp) {
-          //         log.info("忽略过期请求", stamp, this.requestTimeStamp);
-          //         return;
-          //       }
-          //       let data = res.data;
-          //       if (data.status) {
-          //         log.info("error status " + data.status);
-          //         return;
-          //       }
-          //       // console.log('data' , data);
-          //       log.info(data.result.sematic_description);
-          //     });
-          // },
           function(callback) {
             log.debug("1--------------");
             // 获得屏幕区域
@@ -123,6 +103,20 @@ export default {
                     longitude: pos2.longitude
                   }
                 ];
+                //TODO 计划线路
+                baiduApi
+                  .planRoute({
+                    origin: pos1.latitude + "," + pos1.longitude,
+                    destination: pos2.latitude + "," + pos2.longitude
+                  })
+                  .then(res => {
+                    console.info('......',res);
+                    callback(null,res);
+                  })
+                  .catch(err => {
+                    callback(err);
+                  });
+
                 callback(null, res);
               },
               fail: err => {
