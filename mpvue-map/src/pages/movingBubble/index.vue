@@ -56,17 +56,34 @@ export default {
       log.debug("control tap....", this.mapCtx);
       this.randomPos();
     },
-
-    createMoveFunctions: function(mapCtx, markerId, res) {
+    caculateRotate: function(from, to) {
+      let degrees = 45;
+      return degrees * Math.PI / 180;
+    },
+    createMoveFunctions: function(mapCtx, markerId, startPos, res) {
+      const that = this;
       let routes = res.data.result.routes[0];
       let steps = routes.steps;
+
       log.info("开始移动汽车1");
-      function move(pos, next) {
-        log.info("移向", pos);
+      function move(stepItem, next) {
+        let rotate = that.caculateRotate(
+          stepItem.from,
+          stepItem.to
+        );
+        log.info(
+          "移向",
+          stepItem.from,
+          stepItem.to,
+          rotate,
+          stepItem.parentStep
+        );
+        
         mapCtx.translateMarker({
           markerId: markerId,
-          destination: pos,
-          autoRotate: true,
+          destination: stepItem.to,
+          rotate: rotate,
+          // autoRotate: true,
           duration: 5000,
           animationEnd: () => {
             log.info("end...");
@@ -79,22 +96,48 @@ export default {
         });
       }
       let allpoints = [];
+      //path里包含的更详细的分段信息，路况就基于这个分段
+      let fromPos = startPos;
       steps.map(item => {
         let tempPoints = item.path.split(";");
         tempPoints.map(tempPoint => {
           let point = tempPoint.split(",");
-          let p = {
+          let to = {
             longitude: parseFloat(point[0]),
             latitude: parseFloat(point[1])
           };
+          let p = {
+            parentStep: item,
+            from: fromPos,
+            to: to
+          };
+          fromPos = to;
           allpoints.push(p);
         });
       });
+      // steps.map(item => {
+      //   let tempPoints = item.path.split(";");
+      //   tempPoints.map(tempPoint => {
+      //     let point = tempPoint.split(",");
+      //     let p = {
+      //       longitude: parseFloat(point[0]),
+      //       latitude: parseFloat(point[1])
+      //     };
+      //     let p2 = {
+      //       start_location:item.start_location
+      //     };
+      //     allpoints.push(item);
+      //   });
+      // });
       log.info("allpoints...", allpoints);
 
+      // let fromPos = startPos;
+      //直接传入steps,会产生直接跳跃的情况，详细的分段才是贴近实际的道路
       let moveFuncs = allpoints.map(item => {
         return function func(callback) {
-          move(item, callback);
+          move(item, function() {
+            callback();
+          });
         };
       });
 
@@ -102,7 +145,7 @@ export default {
     },
     randomPos: function(stamp) {
       const that = this;
-      // TODO 随机地图范围内上的两个点
+      //随机地图范围内上的两个点
       let pos1 = null;
       let pos2 = null;
 
@@ -158,6 +201,8 @@ export default {
                     width: 25,
                     height: 25,
                     callout: {
+                      borderRadius:5,
+                      bgColor:'#ccc',
                       display: "ALWAYS",
                       content: "汽车1 callout"
                     },
@@ -191,7 +236,7 @@ export default {
           },
           function(res, callback) {
             //移动汽车1
-            let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, res);
+            let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1, res);
             async.waterfall(moveFuncs, (err, result) => {
               log.info("汽车1移动结束。", err);
             });
