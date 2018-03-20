@@ -57,6 +57,49 @@ export default {
       this.randomPos();
     },
 
+    createMoveFunctions: function(mapCtx, markerId, res) {
+      let routes = res.data.result.routes[0];
+      let steps = routes.steps;
+      log.info("开始移动汽车1");
+      function move(pos, next) {
+        log.info("移向", pos);
+        mapCtx.translateMarker({
+          markerId: markerId,
+          destination: pos,
+          autoRotate: true,
+          duration: 5000,
+          animationEnd: () => {
+            log.info("end...");
+            next(null);
+          },
+          fail: err => {
+            log.error("移动汽车错误", err);
+            next(err);
+          }
+        });
+      }
+      let allpoints = [];
+      steps.map(item => {
+        let tempPoints = item.path.split(";");
+        tempPoints.map(tempPoint => {
+          let point = tempPoint.split(",");
+          let p = {
+            longitude: parseFloat(point[0]),
+            latitude: parseFloat(point[1])
+          };
+          allpoints.push(p);
+        });
+      });
+      log.info("allpoints...", allpoints);
+
+      let moveFuncs = allpoints.map(item => {
+        return function func(callback) {
+          move(item, callback);
+        };
+      });
+
+      return moveFuncs;
+    },
     randomPos: function(stamp) {
       const that = this;
       // TODO 随机地图范围内上的两个点
@@ -131,34 +174,28 @@ export default {
                     destination: pos2.latitude + "," + pos2.longitude
                   })
                   .then(res => {
-                    log.debug("......", res);
+                    log.debug("完成计划线路", res);
                     let routes = that.parsePolyLine(res.data);
                     that.polyline = routes;
-                    //TODO 移动汽车1
-                    that.mapCtx.translateMarker({
-                      markerId: 1,
-                      destination: pos2,
-                      autoRotate: true,
-                      duration: 5000,
-                      animationEnd: () => {
-                        log.info("end...");
-                      }
-                    });
-                    callback(null, routes);
+
+                    callback(null, res);
                   })
                   .catch(err => {
                     callback(err);
                   });
-
-                callback(null, res);
               },
               fail: err => {
                 log.error(err);
               }
             });
           },
-          function(arg1, callback) {
-            // arg1 now equals 'one' and arg2 now equals 'two'
+          function(res, callback) {
+            //移动汽车1
+            let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, res);
+            async.waterfall(moveFuncs, (err, result) => {
+              log.info("汽车1移动结束。", err);
+            });
+
             callback(null, "three");
           },
           function(arg1, callback) {
