@@ -57,8 +57,29 @@ export default {
       this.randomPos();
     },
     caculateRotate: function(from, to) {
-      let degrees = 45;
-      return degrees;
+      // return 45;
+      try {
+        let degrees = 0;
+        let y = to.longitude - from.longitude;
+        let x = to.latitude - from.latitude;
+
+        //除0修正
+        // if (Math.abs(x) < 0.001) {
+        //   x = x > 0 ? 0.001 : -0.001;
+        // }
+
+        degrees = Math.atan(y / x) * 180 / Math.PI;
+
+        // if (degrees < 0) {
+        //   degrees += 360;
+        // }
+
+        log.info("---", degrees);
+
+        return degrees;
+      } catch (err) {
+        log.error("caculateRotate", err);
+      }
     },
     createMoveFunctions: function(mapCtx, markerId, startPos, res) {
       const that = this;
@@ -80,6 +101,7 @@ export default {
           markerId: markerId,
           destination: stepItem.to,
           rotate: rotateV,
+          autoRotate: false,
           // duration: 5000,
           animationEnd: () => {
             log.info("end...");
@@ -250,6 +272,14 @@ export default {
             });
           },
           function(res, callback) {
+            //移动汽车1
+            //在有polyline的路径上移动rotate不起作用
+            // let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1_, res);
+            // async.waterfall(moveFuncs, (err, result) => {
+            //   log.info("汽车1移动结束。", err);
+            // });
+            // callback(null, "three");
+            // return;
             baiduApi
               .planRoute({
                 origin: pos1.latitude + "," + pos1.longitude,
