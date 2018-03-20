@@ -96,24 +96,54 @@ export default {
                   {
                     iconPath: "/static/imgs/icon_location.png",
                     latitude: pos1.latitude,
-                    longitude: pos1.longitude
+                    longitude: pos1.longitude,
+                    width: 25,
+                    height: 30
                   },
                   {
                     iconPath: "/static/imgs/icon_location.png",
                     latitude: pos2.latitude,
-                    longitude: pos2.longitude
+                    longitude: pos2.longitude,
+                    width: 25,
+                    height: 30
+                  },
+                  {
+                    id: 1,
+                    iconPath: "/static/imgs/car.png",
+                    latitude: pos1.latitude,
+                    longitude: pos1.longitude,
+                    width: 25,
+                    height: 25,
+                    callout: {
+                      display: "ALWAYS",
+                      content: "汽车1 callout"
+                    },
+                    label: {
+                      // fontSize:26,
+                      content: "汽车1 label"
+                    }
                   }
                 ];
-                //TODO 计划线路
+                //计划线路
                 baiduApi
                   .planRoute({
                     origin: pos1.latitude + "," + pos1.longitude,
                     destination: pos2.latitude + "," + pos2.longitude
                   })
                   .then(res => {
-                    console.debug("......", res);
+                    log.debug("......", res);
                     let routes = that.parsePolyLine(res.data);
                     that.polyline = routes;
+                    //TODO 移动汽车1
+                    that.mapCtx.translateMarker({
+                      markerId: 1,
+                      destination: pos2,
+                      autoRotate: true,
+                      duration: 5000,
+                      animationEnd: () => {
+                        log.info("end...");
+                      }
+                    });
                     callback(null, routes);
                   })
                   .catch(err => {
