@@ -1,4 +1,4 @@
-const utils = require("./util.js");
+import utils from "./util.js";
 
 const LevelEnum = {
   debug: "debug",
@@ -14,7 +14,7 @@ const ColorEnum = {
   error: "red"
 };
 
-module.exports = {
+export default {
   debug: function(...args) {
     this.print(LevelEnum.debug, ColorEnum.log, ...args);
   },

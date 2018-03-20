@@ -1,6 +1,6 @@
 <template>
   <div class="my-container">
-      <map id="map" class='map' :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
+      <map id="map" class='map' :polyline="polyline" :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
           <cover-view class="time"  :style="popStyle">{{popMsg}}</cover-view>
       </map>
   </div>
@@ -8,14 +8,15 @@
 
 <script>
 import async from "async";
-import log from "../../utils/log";
-import baiduApi from "../../utils/baiduApi";
+import log from "@/utils/log";
+import baiduApi from "@/utils/baiduApi";
 
 export default {
   data() {
     return {
       popStyle: "some",
       motto: "Hello World",
+      polyline: null,
       userInfo: {},
       markers: [],
       controls: [
@@ -65,7 +66,7 @@ export default {
       async.waterfall(
         [
           function(callback) {
-            log.debug("1--------------");
+            // log.debug("1--------------");
             // 获得屏幕区域
             that.mapCtx.getRegion({
               success: function(res) {
@@ -110,8 +111,10 @@ export default {
                     destination: pos2.latitude + "," + pos2.longitude
                   })
                   .then(res => {
-                    console.info('......',res);
-                    callback(null,res);
+                    console.debug("......", res);
+                    let routes = that.parsePolyLine(res.data);
+                    that.polyline = routes;
+                    callback(null, routes);
                   })
                   .catch(err => {
                     callback(err);
@@ -143,6 +146,86 @@ export default {
 
       // TODO 路线规划
       // TODO 开始按路线行进
+    },
+
+    parsePolyLine: function(data) {
+      let routes = data.result.routes[0];
+      let steps = routes.steps;
+
+      let nnps = [];
+      let ployLine = steps.map(item => {
+        let tempPoints = item.path.split(";");
+        let points = tempPoints.map(tempPoint => {
+          let point = tempPoint.split(",");
+          let res = {
+            lng: point[0],
+            lat: point[1]
+          };
+          // let res = lngLatUtil.bdmapToMapabcEncryt(point[0], point[1]);
+          return {
+            longitude: res.lng,
+            latitude: res.lat
+          };
+        });
+
+        let cppoints = [...points];
+        //后两位是Alpha(?)%,如果要100，则设置为空字符串
+        let alpha = "50";
+        let borderColor = "#BC0909";
+        //边框宽度实际效果总是很大，不知为何？
+        // let borderWidth = 0.00001;
+        let borderWidth = 0;
+        let lineWidth = 10;
+
+        let traffics = item.traffic_condition.map(tempPoint => {
+          // sum += tempPoint.geo_cnt;
+          //不支持命名颜色
+
+          let color = "#cccccc" + alpha;
+          if (1 == tempPoint.status) {
+            color = "#00ff00" + alpha;
+          } else if (2 == tempPoint.status) {
+            color = "#0000ff" + alpha;
+          } else if (3 == tempPoint.status) {
+            color = "#e69138" + alpha;
+          } else if (4 == tempPoint.status) {
+            color = "#cc0000" + alpha;
+          }
+          nnps.push({
+            points: points.splice(0, tempPoint.geo_cnt),
+            // points: points,
+            color: color,
+            width: lineWidth,
+            borderWidth: borderWidth,
+            arrowLine: true,
+            borderColor: borderColor
+          });
+        });
+
+        //添加整段去掉实时路况中间间隔
+        nnps.unshift({
+          points: cppoints,
+          color: "#cccccc" + alpha,
+          width: lineWidth,
+          borderWidth: borderWidth,
+          arrowLine: true,
+          borderColor: borderColor
+        });
+
+        return {
+          points: cppoints,
+          color: "#0091ff" + alpha,
+          width: lineWidth,
+          borderWidth: borderWidth,
+          arrowLine: true,
+          borderColor: borderColor
+        };
+      });
+
+      log.info("polyline1", ployLine);
+      log.info("polyline2", nnps);
+
+      return nnps;
     },
 
     relocate: function() {},
