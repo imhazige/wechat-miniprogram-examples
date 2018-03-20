@@ -144,6 +144,8 @@ export default {
       //随机地图范围内上的两个点
       let pos1 = null;
       let pos2 = null;
+      let pos1_ = null;
+      let pos2_ = null;
 
       async.waterfall(
         [
@@ -166,6 +168,19 @@ export default {
                     res.southwest.latitude + Math.random() * latitudeScope
                 };
                 pos2 = {
+                  longitude:
+                    res.southwest.longitude + Math.random() * longitudeScope,
+                  latitude:
+                    res.southwest.latitude + Math.random() * latitudeScope
+                };
+
+                pos1_ = {
+                  longitude:
+                    res.southwest.longitude + Math.random() * longitudeScope,
+                  latitude:
+                    res.southwest.latitude + Math.random() * latitudeScope
+                };
+                pos2_ = {
                   longitude:
                     res.southwest.longitude + Math.random() * longitudeScope,
                   latitude:
@@ -213,8 +228,8 @@ export default {
                 //计划线路
                 baiduApi
                   .planRoute({
-                    origin: pos1.latitude + "," + pos1.longitude,
-                    destination: pos2.latitude + "," + pos2.longitude
+                    origin: pos1_.latitude + "," + pos1_.longitude,
+                    destination: pos2_.latitude + "," + pos2_.longitude
                   })
                   .then(res => {
                     log.debug("完成计划线路", res);
@@ -235,13 +250,30 @@ export default {
             });
           },
           function(res, callback) {
-            //移动汽车1
-            let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1, res);
-            async.waterfall(moveFuncs, (err, result) => {
-              log.info("汽车1移动结束。", err);
-            });
+            baiduApi
+              .planRoute({
+                origin: pos1.latitude + "," + pos1.longitude,
+                destination: pos2.latitude + "," + pos2.longitude
+              })
+              .then(res => {
+                log.debug("完成计划线路2", res);
 
-            callback(null, "three");
+                //移动汽车1
+                let moveFuncs = that.createMoveFunctions(
+                  that.mapCtx,
+                  1,
+                  pos1,
+                  res
+                );
+                async.waterfall(moveFuncs, (err, result) => {
+                  log.info("汽车1移动结束。", err);
+                });
+
+                callback(null, "three");
+              })
+              .catch(err => {
+                callback(err);
+              });
           },
           function(arg1, callback) {
             // arg1 now equals 'three'
