@@ -1,6 +1,6 @@
 <template>
   <div class="my-container">
-      <map id="map" class='map' :polyline="polyline" :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
+      <map id="map" class='map' show-location :polyline="polyline" :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
           <cover-view class="time"  :style="popStyle">{{popMsg}}</cover-view>
       </map>
   </div>
@@ -18,7 +18,7 @@ export default {
       motto: "Hello World",
       polyline: null,
       userInfo: {},
-      markers: [],
+      markers: null,
       controls: [
         {
           id: 1,
@@ -58,7 +58,7 @@ export default {
     },
     caculateRotate: function(from, to) {
       let degrees = 45;
-      return degrees * Math.PI / 180;
+      return degrees;
     },
     createMoveFunctions: function(mapCtx, markerId, startPos, res) {
       const that = this;
@@ -67,24 +67,20 @@ export default {
 
       log.info("开始移动汽车1");
       function move(stepItem, next) {
-        let rotate = that.caculateRotate(
-          stepItem.from,
-          stepItem.to
-        );
+        let rotateV = that.caculateRotate(stepItem.from, stepItem.to);
         log.info(
           "移向",
           stepItem.from,
           stepItem.to,
-          rotate,
+          rotateV,
           stepItem.parentStep
         );
-        
+
         mapCtx.translateMarker({
           markerId: markerId,
           destination: stepItem.to,
-          rotate: rotate,
-          // autoRotate: true,
-          duration: 5000,
+          rotate: rotateV,
+          // duration: 5000,
           animationEnd: () => {
             log.info("end...");
             next(null);
@@ -187,6 +183,7 @@ export default {
                     height: 30
                   },
                   {
+                    id: "sss",
                     iconPath: "/static/imgs/icon_location.png",
                     latitude: pos2.latitude,
                     longitude: pos2.longitude,
@@ -200,9 +197,10 @@ export default {
                     longitude: pos1.longitude,
                     width: 25,
                     height: 25,
+                    rotate: 0,
                     callout: {
-                      borderRadius:5,
-                      bgColor:'#ccc',
+                      borderRadius: 5,
+                      bgColor: "#ccc",
                       display: "ALWAYS",
                       content: "汽车1 callout"
                     },
@@ -221,6 +219,8 @@ export default {
                   .then(res => {
                     log.debug("完成计划线路", res);
                     let routes = that.parsePolyLine(res.data);
+                    //使用了polyline,translateMarker方法的rotate就不起作用
+                    // log.info('======',JSON.stringify(routes.splice(0,3)));
                     that.polyline = routes;
 
                     callback(null, res);
@@ -255,9 +255,6 @@ export default {
           log.info("---" + result);
         }
       );
-
-      // TODO 路线规划
-      // TODO 开始按路线行进
     },
 
     parsePolyLine: function(data) {
