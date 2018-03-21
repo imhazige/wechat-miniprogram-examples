@@ -11,6 +11,7 @@
 	"compileType": "miniprogram",
 	"appid": "touristappid",
 	"projectname": "mpvue-map",
+	"libVersion": "1.9.93",
 	"condition": {
 		"search": {
 			"current": -1,

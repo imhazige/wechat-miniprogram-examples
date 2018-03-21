@@ -59,6 +59,7 @@ export default {
     },
     caculateRotate: function(from, to) {
       //中国区在东经北纬，可当作x,y座标系计算,但是要依据api,rotate转换成顺时针值
+      //这个经测试适合全球所有区域
       let x = to.longitude - from.longitude;
       let y = to.latitude - from.latitude;
 
@@ -75,7 +76,7 @@ export default {
 
       log.info("开始移动汽车1");
       function move(stepItem, next) {
-        let rotateV = that.calAngle(stepItem.from, stepItem.to);
+        let rotateV = that.caculateRotate(stepItem.from, stepItem.to);
         log.info(
           "移向",
           stepItem.from,
@@ -275,8 +276,8 @@ export default {
             });
           },
           function(res, callback) {
-            callback(null, "done");
-            return;
+            // callback(null, "done");
+            // return;
             //移动汽车1
             //在有polyline的路径上移动rotate不起作用
             // let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1_, res);
@@ -320,7 +321,7 @@ export default {
           // result now equals 'done'
           if (err) {
           }
-          log.info("---" + result);
+          log.info("waterfall done" + err);
         }
       );
     },
