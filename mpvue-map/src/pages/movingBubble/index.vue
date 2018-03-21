@@ -19,6 +19,7 @@ export default {
       polyline: null,
       userInfo: {},
       markers: null,
+      markerCar: null,
       controls: [
         {
           id: 1,
@@ -57,29 +58,15 @@ export default {
       this.randomPos();
     },
     caculateRotate: function(from, to) {
-      // return 45;
-      try {
-        let degrees = 0;
-        let y = to.longitude - from.longitude;
-        let x = to.latitude - from.latitude;
+      //中国区在东经北纬，可当作x,y座标系计算,但是要依据api,rotate转换成顺时针值
+      let x = to.longitude - from.longitude;
+      let y = to.latitude - from.latitude;
 
-        //除0修正
-        // if (Math.abs(x) < 0.001) {
-        //   x = x > 0 ? 0.001 : -0.001;
-        // }
+      let degrees = Math.atan2(x, y);
 
-        degrees = Math.atan(y / x) * 180 / Math.PI;
+      degrees = degrees * 180 / Math.PI;
 
-        // if (degrees < 0) {
-        //   degrees += 360;
-        // }
-
-        log.info("---", degrees);
-
-        return degrees;
-      } catch (err) {
-        log.error("caculateRotate", err);
-      }
+      return degrees;
     },
     createMoveFunctions: function(mapCtx, markerId, startPos, res) {
       const that = this;
@@ -88,7 +75,7 @@ export default {
 
       log.info("开始移动汽车1");
       function move(stepItem, next) {
-        let rotateV = that.caculateRotate(stepItem.from, stepItem.to);
+        let rotateV = that.calAngle(stepItem.from, stepItem.to);
         log.info(
           "移向",
           stepItem.from,
@@ -96,7 +83,19 @@ export default {
           rotateV,
           stepItem.parentStep
         );
+        log.info(`角度值${rotateV}`);
 
+        //尝试直接设置rotate,显示是正常的,这种方法导致刷新频繁闪烁,实际效果很不好
+        // setTimeout(function() {
+        //   that.markerCar.rotate = rotateV;
+        //   next(null);
+        // }, 300);
+
+        //计算的角度正确，但是translateMarker方法问题较多:
+        // 1:rotate并没有按照设置的值来(直接设置marker的rotate是正常的)
+        // 2:莫名其妙的消失又出现(似乎是当rotate=0时会消失)
+        // 3: autoRotate=true的角度也是莫名其妙
+        // 4:如果有polyline在行进线路上，则会导致rotate不起作用,没有任何效果
         mapCtx.translateMarker({
           markerId: markerId,
           destination: stepItem.to,
@@ -209,7 +208,29 @@ export default {
                     res.southwest.latitude + Math.random() * latitudeScope
                 };
 
+                let degree = that.caculateRotate(pos1, pos2);
+                log.debug("rotate", degree);
                 log.debug("随机点", pos1, pos2);
+
+                that.markerCar = {
+                  id: 1,
+                  iconPath: "/static/imgs/car.png",
+                  latitude: pos1.latitude,
+                  longitude: pos1.longitude,
+                  width: 25,
+                  height: 25,
+                  rotate: degree,
+                  callout: {
+                    borderRadius: 5,
+                    bgColor: "#ccc",
+                    display: "ALWAYS",
+                    content: `<a href="http://baidu.com">汽车1 callout</a>`
+                  },
+                  label: {
+                    // fontSize:26,
+                    content: "汽车1 label"
+                  }
+                };
 
                 that.markers = [
                   {
@@ -227,25 +248,7 @@ export default {
                     width: 25,
                     height: 30
                   },
-                  {
-                    id: 1,
-                    iconPath: "/static/imgs/car.png",
-                    latitude: pos1.latitude,
-                    longitude: pos1.longitude,
-                    width: 25,
-                    height: 25,
-                    rotate: 0,
-                    callout: {
-                      borderRadius: 5,
-                      bgColor: "#ccc",
-                      display: "ALWAYS",
-                      content: "汽车1 callout"
-                    },
-                    label: {
-                      // fontSize:26,
-                      content: "汽车1 label"
-                    }
-                  }
+                  that.markerCar
                 ];
                 //计划线路
                 baiduApi
@@ -272,6 +275,8 @@ export default {
             });
           },
           function(res, callback) {
+            callback(null, "done");
+            return;
             //移动汽车1
             //在有polyline的路径上移动rotate不起作用
             // let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1_, res);
@@ -308,6 +313,7 @@ export default {
           function(arg1, callback) {
             // arg1 now equals 'three'
             callback(null, "done");
+            // that.markerCar.rotate = 30;
           }
         ],
         function(err, result) {
