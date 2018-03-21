@@ -2,6 +2,7 @@
   <div class="my-container">
       <map id="map" class='map' show-location :polyline="polyline" :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
           <cover-view class="time"  :style="popStyle">{{popMsg}}</cover-view>
+          <cover-view class="map-btn-clear" @tap="onBtnClearTap">清空</cover-view>
       </map>
   </div>
 </template>
@@ -20,6 +21,7 @@ export default {
       userInfo: {},
       markers: null,
       markerCar: null,
+      stopwaterfall:null,
       controls: [
         {
           id: 1,
@@ -41,6 +43,10 @@ export default {
   components: {},
 
   methods: {
+    onBtnClearTap: function() {
+      this.markers = null;
+      this.that.stopwaterfall = true;
+    },
     getUserInfo() {
       // 调用登录接口
       wx.login({
@@ -55,7 +61,9 @@ export default {
     },
     onControltap: function(e) {
       log.debug("control tap....", this.mapCtx);
-      this.randomPos();
+      that.stopwaterfall = true;
+      async.nextTick(this.randomPos);
+      // this.randomPos();
     },
     caculateRotate: function(from, to) {
       //中国区在东经北纬，可当作x,y座标系计算,但是要依据api,rotate转换成顺时针值
@@ -97,21 +105,27 @@ export default {
         // 2:莫名其妙的消失又出现(似乎是当rotate=0时会消失)
         // 3: autoRotate=true的角度也是莫名其妙
         // 4:如果有polyline在行进线路上，则会导致rotate不起作用,没有任何效果
-        mapCtx.translateMarker({
-          markerId: markerId,
-          destination: stepItem.to,
-          rotate: rotateV,
-          autoRotate: false,
-          // duration: 5000,
-          animationEnd: () => {
-            log.info("end...");
-            next(null);
-          },
-          fail: err => {
-            log.error("移动汽车错误", err);
-            next(err);
-          }
-        });
+        // 5:如果中途清空markers,则此函数不再起作用
+        try {
+          mapCtx.translateMarker({
+            markerId: markerId,
+            destination: stepItem.to,
+            rotate: rotateV,
+            autoRotate: false,
+            // duration: 5000,
+            animationEnd: () => {
+              log.info("end...");
+              next(that.stopwaterfall);
+            },
+            fail: err => {
+              log.error("移动汽车错误", err);
+              // throw new Error(err);
+              next(err, null);
+            }
+          });
+        } catch (err) {
+          next(err);
+        }
       }
       let allpoints = [];
       //path里包含的更详细的分段信息，路况就基于这个分段
@@ -153,9 +167,7 @@ export default {
       //直接传入steps,会产生直接跳跃的情况，详细的分段才是贴近实际的道路
       let moveFuncs = allpoints.map(item => {
         return function func(callback) {
-          move(item, function() {
-            callback();
-          });
+          move(item, callback);
         };
       });
 
@@ -168,6 +180,7 @@ export default {
       let pos2 = null;
       let pos1_ = null;
       let pos2_ = null;
+      that.stopwaterfall = null;
 
       async.waterfall(
         [
@@ -303,9 +316,8 @@ export default {
                 );
                 async.waterfall(moveFuncs, (err, result) => {
                   log.info("汽车1移动结束。", err);
+                  callback(null, "three");
                 });
-
-                callback(null, "three");
               })
               .catch(err => {
                 callback(err);
@@ -321,7 +333,7 @@ export default {
           // result now equals 'done'
           if (err) {
           }
-          log.info("waterfall done" + err);
+          log.info("waterfall done", err);
         }
       );
     },
@@ -429,7 +441,12 @@ body {
   height: 100%;
   width: 100%;
 }
-
+.map-btn-clear {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  background-color: blue;
+}
 .time {
   text-align: center;
   background-color: rgba(0, 0, 0, 0.5);
