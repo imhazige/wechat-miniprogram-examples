@@ -9,11 +9,14 @@ import async from "async";
 import log from "@/utils/log";
 import baiduApi from "@/utils/baiduApi";
 
+// const sitePrefix = '';
+const sitePrefix = "https://imhazige.github.io/wechat-miniprogram-examples";
+
 export default {
   data() {
     return {
       // url:'https://mp.weixin.qq.com/',
-      url:'/static/webview-test-html/webview-test-html.html'
+      url: sitePrefix + "/static/webview-test-html/webview-test-html.html"
     };
   },
 
@@ -21,7 +24,7 @@ export default {
 
   methods: {
     onMessage: function(e) {
-      log.info('on Message',e);
+      log.info("on Message", e);
     }
   },
   mounted() {},
