@@ -42,7 +42,7 @@ export default {
           clickable: true
         }
       ],
-      popMsg: "init"
+      popMsg: "这是一个CoverView"
     };
   },
 
@@ -129,7 +129,8 @@ export default {
       return allpoints;
     },
     /**
-     * 计算地图座标对应屏幕座标
+     * 计算地图座标对应地图上的屏幕座标
+     * 不可行，暂时没想到精确的方法，顶多获得百分比
      */
     geo2MapXY: function(mapContext, pos) {
       return { x: "50%", y: "50%" };
@@ -141,7 +142,7 @@ export default {
       log.info("开始移动汽车2");
       function move(stepItem, next) {
         let rotateV = that.caculateRotate(stepItem.from, stepItem.to);
-        //TODO 计算地图座标对应屏幕座标
+        //TODO 计算地图座标对应地图上的屏幕座标
         let fromXY = that.geo2MapXY(mapCtx,stepItem.from);
         let toXY = that.geo2MapXY(mapCtx,stepItem.to);
         //TODO 渐进动画
@@ -350,9 +351,9 @@ export default {
             callback(null);
           },
           function(callback) {
-            log.info('线路一已被注释');
-            callback(null, "done");
-            return;
+            // log.info('线路一已被注释');
+            // callback(null, "done");
+            // return;
             //移动汽车1
             //在有polyline的路径上移动rotate不起作用
             // let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1_, res);
