@@ -1,7 +1,10 @@
 <template>
   <div class="my-container">
       <map id="map" class='map' show-location :polyline="polyline" :markers="markers" :controls="controls" @controltap="onControltap"  @regionchange="onMapRegionchange" @end="onMapRegionchange" @start="onMapRegionchange">
-          <cover-view class="time"  :style="popStyle">{{popMsg}}</cover-view>
+          <cover-view class="cover-view-car2" :style="car2viewStyle">
+            <cover-view class="cover-view-car2-popup"  :style="popStyle">{{popMsg}}</cover-view>
+            <cover-image src="/static/imgs/car.png" class="cover-view-car2-img"  :style="car2Style"></cover-image>
+          </cover-view>
           <cover-view class="map-btn-clear" @tap="onBtnClearTap">清空</cover-view>
       </map>
   </div>
@@ -15,13 +18,16 @@ import baiduApi from "@/utils/baiduApi";
 export default {
   data() {
     return {
-      popStyle: "some",
+      car2viewStyle: "",
+      popStyle: "",
+      popMsg: "some",
+      car2Style: "",
       motto: "Hello World",
       polyline: null,
       userInfo: {},
       markers: null,
       markerCar: null,
-      stopwaterfall:null,
+      stopwaterfall: null,
       controls: [
         {
           id: 1,
@@ -45,7 +51,7 @@ export default {
   methods: {
     onBtnClearTap: function() {
       this.markers = null;
-      this.that.stopwaterfall = true;
+      this.stopwaterfall = true;
     },
     getUserInfo() {
       // 调用登录接口
@@ -60,6 +66,7 @@ export default {
       });
     },
     onControltap: function(e) {
+      const that = this;
       log.debug("control tap....", this.mapCtx);
       that.stopwaterfall = true;
       async.nextTick(this.randomPos);
@@ -77,10 +84,84 @@ export default {
 
       return degrees;
     },
-    createMoveFunctions: function(mapCtx, markerId, startPos, res) {
-      const that = this;
+    /**
+     *
+     */
+    buildSteps: function(startPos, res) {
       let routes = res.data.result.routes[0];
       let steps = routes.steps;
+      // let fromPos = startPos;
+      //直接传入steps,会产生直接跳跃的情况，详细的分段才是贴近实际的道路
+      // steps.map(item => {
+      //   let tempPoints = item.path.split(";");
+      //   tempPoints.map(tempPoint => {
+      //     let point = tempPoint.split(",");
+      //     let p = {
+      //       longitude: parseFloat(point[0]),
+      //       latitude: parseFloat(point[1])
+      //     };
+      //     let p2 = {
+      //       start_location:item.start_location
+      //     };
+      //     allpoints.push(item);
+      //   });
+      // });
+      //path里包含的更详细的分段信息，路况就基于这个分段
+      let allpoints = [];
+      let fromPos = startPos;
+      steps.map(item => {
+        let tempPoints = item.path.split(";");
+        tempPoints.map(tempPoint => {
+          let point = tempPoint.split(",");
+          let to = {
+            longitude: parseFloat(point[0]),
+            latitude: parseFloat(point[1])
+          };
+          let p = {
+            parentStep: item,
+            from: fromPos,
+            to: to
+          };
+          fromPos = to;
+          allpoints.push(p);
+        });
+      });
+      return allpoints;
+    },
+    /**
+     * 计算地图座标对应屏幕座标
+     */
+    geo2MapXY: function(mapContext, pos) {
+      return { x: "50%", y: "50%" };
+    },
+    createMoveCoverViewFunctions: function(mapCtx, startPos, res) {
+      const that = this;
+      let allpoints = that.buildSteps(startPos, res);
+
+      log.info("开始移动汽车2");
+      function move(stepItem, next) {
+        let rotateV = that.caculateRotate(stepItem.from, stepItem.to);
+        //TODO 计算地图座标对应屏幕座标
+        let fromXY = that.geo2MapXY(mapCtx,stepItem.from);
+        let toXY = that.geo2MapXY(mapCtx,stepItem.to);
+        //TODO 渐进动画
+        that.car2viewStyle = `left:${toXY.x};top:${toXY.y};`;
+        //TODO 移动屏幕的处理
+
+        next();
+      }
+
+      let moveFuncs = allpoints.map(item => {
+        return function func(callback) {
+          move(item, callback);
+        };
+      });
+
+      return moveFuncs;
+    },
+    createMoveFunctions: function(mapCtx, markerId, startPos, res) {
+      const that = this;
+      let allpoints = that.buildSteps(startPos, res);
 
       log.info("开始移动汽车1");
       function move(stepItem, next) {
@@ -127,44 +208,9 @@ export default {
           next(err);
         }
       }
-      let allpoints = [];
-      //path里包含的更详细的分段信息，路况就基于这个分段
-      let fromPos = startPos;
-      steps.map(item => {
-        let tempPoints = item.path.split(";");
-        tempPoints.map(tempPoint => {
-          let point = tempPoint.split(",");
-          let to = {
-            longitude: parseFloat(point[0]),
-            latitude: parseFloat(point[1])
-          };
-          let p = {
-            parentStep: item,
-            from: fromPos,
-            to: to
-          };
-          fromPos = to;
-          allpoints.push(p);
-        });
-      });
-      // steps.map(item => {
-      //   let tempPoints = item.path.split(";");
-      //   tempPoints.map(tempPoint => {
-      //     let point = tempPoint.split(",");
-      //     let p = {
-      //       longitude: parseFloat(point[0]),
-      //       latitude: parseFloat(point[1])
-      //     };
-      //     let p2 = {
-      //       start_location:item.start_location
-      //     };
-      //     allpoints.push(item);
-      //   });
-      // });
+
       log.info("allpoints...", allpoints);
 
-      // let fromPos = startPos;
-      //直接传入steps,会产生直接跳跃的情况，详细的分段才是贴近实际的道路
       let moveFuncs = allpoints.map(item => {
         return function func(callback) {
           move(item, callback);
@@ -242,7 +288,7 @@ export default {
                   },
                   label: {
                     // fontSize:26,
-                    content: "汽车1 label"
+                    content: '<a href="http://baidu.com">汽车1 callout</a>'
                   }
                 };
 
@@ -255,6 +301,7 @@ export default {
                     height: 30
                   },
                   {
+                    //不要使用字符串作为id,按照文档应该使用number
                     id: "sss",
                     iconPath: "/static/imgs/icon_location.png",
                     latitude: pos2.latitude,
@@ -289,8 +336,23 @@ export default {
             });
           },
           function(res, callback) {
-            // callback(null, "done");
-            // return;
+            log.info('开始路线2');
+            //使用coverView移动示例
+            //移动汽车2
+            let moveFuncs = that.createMoveCoverViewFunctions(
+              that.mapCtx,
+              pos1_,
+              res
+            );
+            async.waterfall(moveFuncs, (err, result) => {
+              log.info("汽车2移动结束。", err);
+            });
+            callback(null);
+          },
+          function(callback) {
+            log.info('线路一已被注释');
+            callback(null, "done");
+            return;
             //移动汽车1
             //在有polyline的路径上移动rotate不起作用
             // let moveFuncs = that.createMoveFunctions(that.mapCtx, 1, pos1_, res);
@@ -360,7 +422,7 @@ export default {
 
         let cppoints = [...points];
         //后两位是Alpha(?)%,如果要100，则设置为空字符串
-        let alpha = "50";
+        let alpha = "90";
         let borderColor = "#BC0909";
         //边框宽度实际效果总是很大，不知为何？
         // let borderWidth = 0.00001;
@@ -437,12 +499,14 @@ export default {
 
 <style>
 /* 全局变量不起作用 */
-:root{
-  --g-c-v:blue;
+:root {
+  --g-c-v: blue;
 }
 /* 起作用 -- page */
 body {
-  --g-c-v:blue;
+  /* 大小必须要rpx，否则不起作用 */
+  --carimg-width: 55rpx;
+  --g-c-v: blue;
   height: 100%;
   width: 100%;
 }
@@ -450,7 +514,13 @@ body {
   position: absolute;
   top: 60%;
   left: 0;
-  background-color:var(--g-c-v);
+  background-color: var(--g-c-v);
+}
+.cover-view-car2 {
+  position: absolute;
+}
+.cover-view-car2-img {
+  width: var(--carimg-width);
 }
 .time {
   text-align: center;
