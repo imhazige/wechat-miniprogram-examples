@@ -30,3 +30,5 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 - 莫名其妙的消失又出现(似乎是当rotate=0时会消失)
 - autoRotate=true的角度也是莫名其妙
 - 如果有polyline在行进线路上，则会导致rotate不起作用,没有任何效果
+### WebView组件
+测试时需要将选项“不校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书”打开

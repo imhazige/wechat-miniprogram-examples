@@ -2,6 +2,7 @@
   <div class="container" @click="clickHandle('test click', $event)">
 
     <button @click="onGoBubblesClick('test click', $event)">移动气泡</button>
+    <button @click="onGoWebViewTestClick('test click', $event)">WebView组件</button>
 
   </div>
 </template>
@@ -39,6 +40,11 @@ export default {
     },
     onGoBubblesClick(ev) {
       const url = "/pages/movingBubble/movingBubble";
+      let arg = { url };
+      wx.navigateTo(arg);
+    },
+    onGoWebViewTestClick(ev) {
+      const url = "/pages/webViewTest/webViewTest";
       let arg = { url };
       wx.navigateTo(arg);
     }
