@@ -9,14 +9,16 @@ import async from "async";
 import log from "@/utils/log";
 import baiduApi from "@/utils/baiduApi";
 
-// const sitePrefix = '';
-const sitePrefix = "https://imhazige.github.io/wechat-miniprogram-examples";
+//for deployed to git pages
+// const sitePrefix = "https://imhazige.github.io/wechat-miniprogram-examples";
+//for local debug
+const sitePrefix = "http://localhost:4000";
 
 export default {
   data() {
     return {
       // url:'https://mp.weixin.qq.com/',
-      url: sitePrefix + "/static/webview-test-html/webview-test-html.html"
+      url: sitePrefix + "/static/webview-test-html/webview-test.html?key=" +  + '#wechat_redirect'
     };
   },
 
