@@ -436,8 +436,13 @@ export default {
 </script>
 
 <style>
+/* 全局变量不起作用 */
+:root{
+  --g-c-v:blue;
+}
 /* 起作用 -- page */
 body {
+  --g-c-v:blue;
   height: 100%;
   width: 100%;
 }
@@ -445,7 +450,7 @@ body {
   position: absolute;
   top: 60%;
   left: 0;
-  background-color: blue;
+  background-color:var(--g-c-v);
 }
 .time {
   text-align: center;
