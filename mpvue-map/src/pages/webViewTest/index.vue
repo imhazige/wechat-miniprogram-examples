@@ -12,13 +12,13 @@ import baiduApi from "@/utils/baiduApi";
 //for deployed to git pages
 // const sitePrefix = "https://imhazige.github.io/wechat-miniprogram-examples";
 //for local debug
-const sitePrefix = "http://localhost:4000";
+
 
 export default {
   data() {
     return {
-      // url:'https://mp.weixin.qq.com/',
-      url: sitePrefix + "/static/webview-test-html/webview-test.html?key=" +  + '#wechat_redirect'
+      url:'https://baidu.com/',
+      // url: 'http://localhost:3000/#wechat_redirect'
     };
   },
 
