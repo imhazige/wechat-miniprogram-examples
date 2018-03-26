@@ -2,3 +2,5 @@ map/key.js
 mpvue-map/src/key.js
 docs/web-view-map/node_modules/
 node_modules/
+*.hot-update.js
+*.hot-update.json

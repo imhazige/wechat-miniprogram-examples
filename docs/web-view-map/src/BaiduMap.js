@@ -9,11 +9,13 @@ const wx = window.wx;
 
 class BaiduMap extends Component {
     componentDidMount() {
-        console.log('---loaded..') // true })    
-        wx.miniProgram.postMessage({ data: { foo: 'bar' } })
-        wx.miniProgram.getEnv(function (res) {
-            console.log('wx env',res.miniprogram) // true })    
-        });
+        console.log('---loaded..'); // true })    
+        if (wx) {
+            wx.miniProgram.postMessage({ data: { foo: 'bar' } })
+            wx.miniProgram.getEnv(function (res) {
+                console.log('wx env', res.miniprogram) // true })    
+            });
+        }
     }
     render() {
         return (
