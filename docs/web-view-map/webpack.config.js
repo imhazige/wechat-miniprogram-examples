@@ -15,7 +15,7 @@ module.exports = {
 		path: resolve(__dirname, 'j'),
 
         //need not here, will not use development server
-		// publicPath: '/assets/aj/d/'
+		publicPath: '/j/'
 		// necessary for HMR to know where to load the hot update chunks
 	},
 
@@ -34,7 +34,7 @@ module.exports = {
 				use: [
 					'babel-loader',
 				],
-				exclude: ['/node_modules/', '/f/']
+				exclude: ['/node_modules/']
 			},
 			{
 				test: /\.css$/,
@@ -42,7 +42,8 @@ module.exports = {
 					'style-loader',
 					'css-loader?modules',
 					'postcss-loader',
-				],
+				]
+				
 			},
 		],
 	},
