@@ -17,8 +17,8 @@ import baiduApi from "@/utils/baiduApi";
 export default {
   data() {
     return {
-      // url:'https://baidu.com/',
-      url: 'http://localhost:4000/index.html#wechat_redirect'
+      url:'http://localhost:3000',
+      // url: 'http://localhost:4000/index.html#wechat_redirect'
     };
   },
 

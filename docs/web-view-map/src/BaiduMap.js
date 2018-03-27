@@ -18,6 +18,7 @@ class BaiduMap extends Component {
         }
     }
     render() {
+        console.log('---renderes.'); // true })    
         return (
         <Button>------</Button>
         );

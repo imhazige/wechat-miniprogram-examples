@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import BaiduMap from './BaiduMap';
 
 import 'weui';
 import 'react-weui/build/packages/react-weui.css';
@@ -13,19 +12,6 @@ const render = (ops) => {
     window.initConfig = ops;
 
     let pageModule = 'BaiduMap';
-
-
-   
-    let PageTag = BaiduMap;
-        ReactDOM.render(
-            <div>
-            <Button >-----</Button>
-            <PageTag />
-            </div>,
-            document.getElementById('root')
-        );
-
-        return;
 
     import(/* webpackChunkName: `${pageModule}` */ `./${pageModule}`).then((m)=>{
         let PageTag = m.default;
