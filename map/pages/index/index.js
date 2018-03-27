@@ -15,6 +15,11 @@ Page({
       url: '/pages/movingPopup/movingPopup'
     })
   },
+  handlerEntryWebview:function(){
+    wx.navigateTo({
+      url: '/pages/webview/webview'
+    })
+  },
   onLoad: function () {
     if (app.globalData.userInfo) {
       this.setData({

@@ -1,5 +1,6 @@
 <!--index.wxml-->
 <view class="container">
   <button bind:tap="handlerEntryPop"> 移动气泡 </button>
+  <button bind:tap="handlerEntryWebview"> WebView </button>
 </view>
 

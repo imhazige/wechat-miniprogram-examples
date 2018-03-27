@@ -29,7 +29,9 @@ export default {
       log.info("on Message", e);
     }
   },
-  mounted() {},
+  mounted() {
+     log.info("mounted");
+  },
   created() {}
 };
 </script>

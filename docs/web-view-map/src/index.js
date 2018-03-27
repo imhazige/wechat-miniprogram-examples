@@ -1,12 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import 'weui';
-import 'react-weui/build/packages/react-weui.css';
-
-import { Button } from 'react-weui';
-//import styles
-
 const render = (ops) => {
     // console.debug(ops);
     window.initConfig = ops;
