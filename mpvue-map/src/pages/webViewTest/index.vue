@@ -10,8 +10,8 @@ import log from "@/utils/log";
 import baiduApi from "@/utils/baiduApi";
 import keys from '@/key.js'
 
-let url = 'https://imhazige.github.io/wechat-miniprogram-examples/web-view-map/build/index.html?ak=' + keys.baiduAppKey;
-// let url = 'http://localhost:3000?ak=' + keys.baiduAppKey;
+// let url = 'https://imhazige.github.io/wechat-miniprogram-examples/web-view-map/build/index.html?ak=' + keys.baiduAppKey;
+let url = 'http://localhost:3000?ak=' + keys.baiduAppKey;
 log.info('url is ' + url);
 
 export default {
