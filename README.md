@@ -8,3 +8,9 @@
 ### [mpvue 地图示例](./mpvue-map/README.md)
 基于mpvue构建的示例，包括
 - 移动的marker, callout, label
+- webview嵌入的baidu地图示例
+
+### [地图示例](./map/README.md)
+包括
+- 移动的marker, callout, label
+- webview嵌入的baidu地图示例
