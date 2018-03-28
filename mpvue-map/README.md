@@ -32,3 +32,9 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 - 如果有polyline在行进线路上，则会导致rotate不起作用,没有任何效果
 ### WebView组件
 测试时需要将选项“不校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书”打开
+
+### 开发运行
+进入/docs/web-view-map目录
+按照所在目录README.md描述启动项目
+本目录下npm run dev
+使用小程序开发工具打开本目录
