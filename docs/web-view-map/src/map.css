@@ -14,6 +14,6 @@ body {
 }
 
 #map_container {
-    height: calc(100% - 46px);
+    height: calc(100% - 29px);
     width: 100%;
 }

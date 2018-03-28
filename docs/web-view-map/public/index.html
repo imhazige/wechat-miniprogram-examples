@@ -23,6 +23,7 @@
   <title>React App</title>
   <script>
     //由于baidu使用document.write，则只好使用document.write将脚本在body之前写入
+    //以避免不允许在body.append里面的脚本不允许调用document.write的限制
     var url_string = window.location.href;
     console.log('url is ' + url_string);
     var url = new URL(url_string);
@@ -31,7 +32,7 @@
     var url = '<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak='+ak+'"></'+'script>';
     document.write(url);
   </script>
-  
+  <script type="text/javascript" src="http://api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js"></script>
 </head>
 
 <body>
