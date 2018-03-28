@@ -8,16 +8,15 @@
 import async from "async";
 import log from "@/utils/log";
 import baiduApi from "@/utils/baiduApi";
+import keys from '@/key.js'
 
-//for deployed to git pages
-// const sitePrefix = "https://imhazige.github.io/wechat-miniprogram-examples";
-//for local debug
-
+let url = 'http://localhost:3000?ak=' + keys.baiduAppKey;
+log.info('url is ' + url);
 
 export default {
   data() {
     return {
-      url:'http://localhost:3000',
+      url:url,
       // url: 'http://localhost:4000/index.html#wechat_redirect'
     };
   },

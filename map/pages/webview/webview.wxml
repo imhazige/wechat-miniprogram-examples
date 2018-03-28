@@ -1,2 +1,2 @@
 <!--pages/webview/webview.wxml-->
-<web-view src="http://localhost:3000" bindmessage="onMyMessage" ></web-view>
+<web-view src="{{url}}" bindmessage="onMyMessage" ></web-view>

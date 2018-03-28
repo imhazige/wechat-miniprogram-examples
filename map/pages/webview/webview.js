@@ -1,18 +1,22 @@
 // pages/webview/webview.js
+import keys from '../../key.js'
+
+let url = 'http://localhost:3000?ak=' + keys.baiduAppKey;
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-  
+    url: url
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-  
+    
   },
 
   /**
