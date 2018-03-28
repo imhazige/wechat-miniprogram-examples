@@ -23,6 +23,39 @@ function doInitMap() {
     var map = new BMap.Map("map_container");
     var point = new BMap.Point(116.404, 39.915);
     map.centerAndZoom(point, 15);
+
+    var traffic = new BMap.TrafficLayer();        // 创建交通流量图层实例      
+    map.addTileLayer(traffic);  
+
+
+
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 14);  // 初始化地图,设置中心点坐标和地图级别
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    var sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+        scale: 0.6,//图标缩放大小
+        strokeColor: '#fff',//设置矢量图标的线填充颜色
+        strokeWeight: '2',//设置线宽
+    });
+    var icons = new BMap.IconSequence(sy, '10', '30');
+    // 创建polyline对象
+    var pois = [
+        new BMap.Point(116.350658, 39.938285),
+        new BMap.Point(116.386446, 39.939281),
+        new BMap.Point(116.389034, 39.913828),
+        new BMap.Point(116.442501, 39.914603)
+    ];
+    var polyline = new BMap.Polyline(pois, {
+        enableEditing: false,//是否启用线编辑，默认为false
+        enableClicking: true,//是否响应点击事件，默认为true
+        icons: [icons],
+        strokeWeight: '8',//折线的宽度，以像素为单位
+        strokeOpacity: 0.8,//折线的透明度，取值范围0 - 1
+        strokeColor: "#18a45b" //折线颜色
+    });
+
+    map.addOverlay(polyline);          //增加折线
+
+
     return;
 }
 
@@ -50,7 +83,7 @@ function initMap() {
 const wx = window.wx;
 wx.miniProgram.getEnv(function (res) {
     console.log('wx env', res.miniprogram) // true })   
-    
+    //postMessage并不能马上传递给小程序，这种交互方式不方便
     wx.miniProgram.postMessage({ data: { foo: 'first message' } });
 });
 
